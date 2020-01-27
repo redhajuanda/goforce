@@ -1,4 +1,4 @@
-package force
+package goforce
 
 import (
 	"fmt"
