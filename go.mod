@@ -1,4 +1,4 @@
-module force
+module github.com/redhajuanda/goforce
 
 require (
 	github.com/joho/godotenv v1.3.0
