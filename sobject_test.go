@@ -7,8 +7,8 @@ import "fmt"
 func TestInsert(t *testing.T) {
 	force := NewClientTest()
 	in := &InsertData{
-		sobject: "Account",
-		fields: map[string]interface{}{
+		SObject: "Account",
+		Fields: map[string]interface{}{
 			"Name": "Testing",
 		},
 	}
@@ -22,9 +22,9 @@ func TestInsert(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	force := NewClientTest()
 	in := &UpdateData{
-		sobject: "Account",
-		id:      "0010w000009kJf8AAE",
-		fields: map[string]interface{}{
+		SObject: "Account",
+		ID:      "0010w000009kJf8AAE",
+		Fields: map[string]interface{}{
 			"Name": "Updaters",
 		},
 	}
@@ -37,8 +37,8 @@ func TestUpdate(t *testing.T) {
 func TestDelete(t *testing.T) {
 	force := NewClientTest()
 	del := &DeleteData{
-		sobject: "Account",
-		id:      "0010w000009kJf8AAE",
+		SObject: "Account",
+		ID:      "0010w000009kJf8AAE",
 	}
 	err := force.Delete(del)
 	if err != nil {

@@ -26,8 +26,8 @@ type InsertValue struct {
 // Fields are the fields of the record that are to be inserted.  It is the
 // callers responsbility to provide value fields and values.
 type Inserter interface {
-	SObject() string
-	Fields() map[string]interface{}
+	GetSObject() string
+	GetFields() map[string]interface{}
 }
 
 // Updater provides the parameters needed to update a record.
@@ -40,7 +40,7 @@ type Inserter interface {
 // callers responsbility to provide value fields and values.
 type Updater interface {
 	Inserter
-	ID() string
+	GetID() string
 }
 
 // Deleter provides the parameters needed to delete a record.
@@ -49,55 +49,55 @@ type Updater interface {
 //
 // ID is the Salesforce ID to be deleted.
 type Deleter interface {
-	SObject() string
-	ID() string
+	GetSObject() string
+	GetID() string
 }
 
 // Represents insert data that is needed to do insert operation
 type InsertData struct {
-	sobject string
-	fields  map[string]interface{}
+	SObject string
+	Fields  map[string]interface{}
 }
 
-func (insert *InsertData) SObject() string {
-	return insert.sobject
+func (insert *InsertData) GetSObject() string {
+	return insert.SObject
 }
 
-func (insert *InsertData) Fields() map[string]interface{} {
-	return insert.fields
+func (insert *InsertData) GetFields() map[string]interface{} {
+	return insert.Fields
 }
 
 // Represents update data that is needed to do update operation
 type UpdateData struct {
-	sobject string
-	id      string
-	fields  map[string]interface{}
+	SObject string
+	ID      string
+	Fields  map[string]interface{}
 }
 
-func (update *UpdateData) SObject() string {
-	return update.sobject
+func (update *UpdateData) GetSObject() string {
+	return update.SObject
 }
 
-func (update *UpdateData) ID() string {
-	return update.id
+func (update *UpdateData) GetID() string {
+	return update.ID
 }
 
-func (update *UpdateData) Fields() map[string]interface{} {
-	return update.fields
+func (update *UpdateData) GetFields() map[string]interface{} {
+	return update.Fields
 }
 
 // Represents delete data that is needed to do delete operation
 type DeleteData struct {
-	sobject string
-	id      string
+	SObject string
+	ID      string
 }
 
-func (delete *DeleteData) SObject() string {
-	return delete.sobject
+func (delete *DeleteData) GetSObject() string {
+	return delete.SObject
 }
 
-func (delete *DeleteData) ID() string {
-	return delete.id
+func (delete *DeleteData) GetID() string {
+	return delete.ID
 }
 
 func (force *ForceAPI) Insert(inserter Inserter) (InsertValue, error) {
@@ -118,9 +118,9 @@ func (force *ForceAPI) Insert(inserter Inserter) (InsertValue, error) {
 
 func (force *ForceAPI) insertRequest(inserter Inserter) (*http.Request, error) {
 
-	url := force.getServiceURL() + objectEndpoint + inserter.SObject()
+	url := force.getServiceURL() + objectEndpoint + inserter.GetSObject()
 
-	body, err := json.Marshal(inserter.Fields())
+	body, err := json.Marshal(inserter.GetFields())
 	if err != nil {
 		return nil, err
 	}
@@ -188,9 +188,9 @@ func (force *ForceAPI) Update(updater Updater) error {
 
 func (force *ForceAPI) updateRequest(updater Updater) (*http.Request, error) {
 
-	url := force.getServiceURL() + objectEndpoint + updater.SObject() + "/" + updater.ID()
+	url := force.getServiceURL() + objectEndpoint + updater.GetSObject() + "/" + updater.GetID()
 
-	body, err := json.Marshal(updater.Fields())
+	body, err := json.Marshal(updater.GetFields())
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +246,7 @@ func (force *ForceAPI) Delete(deleter Deleter) error {
 
 func (force *ForceAPI) deleteRequest(deleter Deleter) (*http.Request, error) {
 
-	url := force.getServiceURL() + objectEndpoint + deleter.SObject() + "/" + deleter.ID()
+	url := force.getServiceURL() + objectEndpoint + deleter.GetSObject() + "/" + deleter.GetID()
 
 	request, err := http.NewRequest(http.MethodDelete, url, nil)
 
