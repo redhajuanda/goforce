@@ -6,7 +6,7 @@ import "fmt"
 
 func TestQuery(t *testing.T) {
 	force := NewClientTest()
-	res, err := force.Query("SELECT Name FROM Contact LIMIT 10")
+	res, err := force.Query("SELECT Id, Email, MobilePhone, Country_g__c FROM Contact WHERE Id='0030o0000368popAAA'")
 	if err != nil {
 		t.Errorf("%v", err)
 	}

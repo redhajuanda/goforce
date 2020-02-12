@@ -31,7 +31,6 @@ func (o *oauth) Authenticate() (client *http.Client, instanceURL string, err err
 		},
 	}
 	// Get the token
-	fmt.Println(o.Username, o.Password)
 	token, err := conf.PasswordCredentialsToken(oauth2.NoContext, o.Username, o.Password)
 	// fmt.Printf("token = %+v\n", token)
 	if err != nil {
@@ -39,7 +38,6 @@ func (o *oauth) Authenticate() (client *http.Client, instanceURL string, err err
 	}
 	// Get the instace URL
 	instanceURL, _ = token.Extra("instance_url").(string)
-	fmt.Println(instanceURL)
 	// Build HTTP Client
 	client = conf.Client(oauth2.NoContext, token)
 	return client, instanceURL, nil
