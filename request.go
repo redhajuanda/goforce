@@ -50,6 +50,16 @@ func (force *ForceAPI) Request(method string, requester Requester) (*Response, e
 			return nil, err
 		}
 		return resp, nil
+	} else if method == "PUT" {
+		req, err := force.createPutRequest(requester)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := force.createResponse(req)
+		if err != nil {
+			return nil, err
+		}
+		return resp, nil
 	} else {
 		return nil, fmt.Errorf("Method is not supported")
 	}
@@ -65,6 +75,26 @@ func (force *ForceAPI) createPostRequest(requester Requester) (*http.Request, er
 	}
 
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
+
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Accept", "application/json")
+	request.Header.Add("Content-Type", "application/json")
+	// r.dml.session.AuthorizationHeader(request)
+	return request, nil
+}
+
+func (force *ForceAPI) createPutRequest(requester Requester) (*http.Request, error) {
+
+	url := force.instanceURL + requester.URL()
+	body, err := json.Marshal(requester.RequestBody())
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(body))
 
 	if err != nil {
 		return nil, err
