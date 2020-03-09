@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 )
 
 type Requester interface {
@@ -16,7 +18,7 @@ type Response struct {
 	Status    string
 	ErrorCode string
 	Message   string
-	Data      []map[string]interface{}
+	Data      interface{}
 }
 
 type ResponseError struct {
@@ -40,7 +42,17 @@ func (r *Request) URL() string {
 }
 
 func (force *ForceAPI) Request(method string, requester Requester) (*Response, error) {
-	if method == "POST" {
+	if method == "GET" {
+		req, err := force.createGETRequest(requester)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := force.createResponse(req)
+		if err != nil {
+			return nil, err
+		}
+		return resp, nil
+	} else if method == "POST" {
 		req, err := force.createPostRequest(requester)
 		if err != nil {
 			return nil, err
@@ -64,6 +76,28 @@ func (force *ForceAPI) Request(method string, requester Requester) (*Response, e
 		return nil, fmt.Errorf("Method is not supported")
 	}
 
+}
+
+func (force *ForceAPI) createGETRequest(requester Requester) (*http.Request, error) {
+
+	v := url.Values{}
+	var q string
+	for key, val := range requester.RequestBody() {
+		fmt.Println(key, val)
+		v.Add(key, fmt.Sprintf("%v", val))
+		q = v.Encode()
+	}
+
+	url := force.instanceURL + requester.URL() + "?" + q
+	fmt.Println(url)
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("createGETRequest, Error on request: %v", err)
+	}
+
+	request.Header.Add("Accept", "application/json")
+	request.Header.Add("Content-Type", "application/json")
+	return request, nil
 }
 
 func (force *ForceAPI) createPostRequest(requester Requester) (*http.Request, error) {
@@ -109,12 +143,14 @@ func (force *ForceAPI) createPutRequest(requester Requester) (*http.Request, err
 func (force *ForceAPI) createResponse(request *http.Request) (*Response, error) {
 
 	response, err := force.client.Do(request)
-	decoder := json.NewDecoder(response.Body)
-	defer response.Body.Close()
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, fmt.Errorf("Error when reading body: %v", err)
+	}
 
 	if response.StatusCode != http.StatusOK {
 		var respErr []ResponseError
-		err = decoder.Decode(&respErr)
+		err = json.Unmarshal(data, &respErr)
 		var errMsg error
 		if err == nil {
 			for _, respErr := range respErr {
@@ -126,10 +162,11 @@ func (force *ForceAPI) createResponse(request *http.Request) (*Response, error) 
 		return nil, errMsg
 	}
 
-	var resp []Response
-	err = decoder.Decode(&resp)
+	var resp Response
+	err = json.Unmarshal(data, &resp)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error when unmarshalling json response: %v", err)
 	}
-	return &resp[0], nil
+
+	return &resp, nil
 }
