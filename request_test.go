@@ -52,7 +52,7 @@ func TestRequestPUT(t *testing.T) {
 	params := Request{
 		ServiceURL: "/services/apexrest/amalia/v2/opportunity",
 		Fields: map[string]interface{}{
-			"OpportunityId":       "0060w0000043jD9AAI",
+			"OpportunityId":       "0060w0000042lSQAAY",
 			"Outstanding_Amount":  998877,
 			"Monthly_Installment": 112233,
 			"Account_Number":      "123456789",

@@ -145,17 +145,15 @@ func (force *ForceAPI) createResponse(request *http.Request) (*Response, error) 
 	response, err := force.client.Do(request)
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Error when reading body: %v", err)
+		return nil, err
 	}
 
 	if response.StatusCode != http.StatusOK {
-		var respErr []ResponseError
+		var respErr ResponseError
 		err = json.Unmarshal(data, &respErr)
 		var errMsg error
 		if err == nil {
-			for _, respErr := range respErr {
-				errMsg = fmt.Errorf("request response err: %s: %s", respErr.ErrorCode, respErr.Message)
-			}
+			errMsg = fmt.Errorf("request response err: %s: %s", respErr.ErrorCode, respErr.Message)
 		} else {
 			errMsg = fmt.Errorf("request response err: %d %s", response.StatusCode, response.Status)
 		}
@@ -165,7 +163,7 @@ func (force *ForceAPI) createResponse(request *http.Request) (*Response, error) 
 	var resp Response
 	err = json.Unmarshal(data, &resp)
 	if err != nil {
-		return nil, fmt.Errorf("Error when unmarshalling json response: %v", err)
+		return nil, err
 	}
 
 	return &resp, nil
