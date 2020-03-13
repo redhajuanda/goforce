@@ -14,9 +14,9 @@ const (
 // InsertValue is the value that is returned when a
 // record is inserted into Salesforce.
 type InsertValue struct {
-	Success bool            `json:"success"`
-	ID      string          `json:"id"`
-	Errors  []ResponseError `json:"errors"`
+	Success bool          `json:"success"`
+	ID      string        `json:"id"`
+	Errors  ResponseError `json:"errors"`
 }
 
 // Inserter provides the parameters needed insert a record.
@@ -147,13 +147,11 @@ func (force *ForceAPI) insertResponse(request *http.Request) (InsertValue, error
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusCreated {
-		var insertErrs []ResponseError
-		err = decoder.Decode(&insertErrs)
+		var insertErr ResponseError
+		err = decoder.Decode(&insertErr)
 		var errMsg error
 		if err == nil {
-			for _, insertErr := range insertErrs {
-				errMsg = fmt.Errorf("insert response err: %s: %s", insertErr.ErrorCode, insertErr.Message)
-			}
+			errMsg = fmt.Errorf("insert response err: %s: %s", insertErr.ErrorCode, insertErr.Message)
 		} else {
 			errMsg = fmt.Errorf("insert response err: %d %s", response.StatusCode, response.Status)
 		}
