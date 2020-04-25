@@ -18,7 +18,7 @@ const (
 )
 forceAPI, err := goforce.NewClient(testClientId, testClientSecret, testUserName, testPassword, testSecurityToken, testEnvironment)
 if err != nil {
-  fmt.Println(err)
+  log.Fatalf("Failed connecting to salesforce: %v", err)
 }
 ```
 
@@ -27,9 +27,9 @@ if err != nil {
 ```
 result, err := forceAPI.Query("SELECT Id FROM Contact LIMIT 10")
 if err != nil {
-  fmt.Println(err)
+  log.Fatalf("Query failed: %v", err)
 }
-fmt.Println(result)
+// do something with response
 ```
 
 ## Insert Record 
@@ -37,43 +37,46 @@ fmt.Println(result)
 insert := &goforce.InsertData{
 		SObject: "Contact",
 		Fields:  map[string]interface{
-        "LastName": "Redha",
-    },
+        		"LastName": "Redha",
+    		},
 }
 
 resp, err := forceAPI.Insert(insert)
 if err != nil {
-  fmt.Println(err)
+  log.Fatalf("Insert failed: %v", err)
 }
+// do something with response
 ```
 
 ## Update Record 
 ```
 update := &goforce.UpdateData{
 		SObject: "Contact",
-    ID: "xxcontact_idxx",
+    		ID: "xxcontact_idxx",
 		Fields:  map[string]interface{
-        "LastName": "Redha update",
-    },
+        		"LastName": "Redha update",
+    		},
 }
 
 resp, err := forceAPI.Update(update)
 if err != nil {
-  fmt.Println(err)
+  log.Fatalf("Update failed: %v", err)
 }
+// do something with response
 ```
 
 ## Delete Record 
 ```
 delete := &goforce.UpdateData{
 		SObject: "Contact",
-    ID: "xxcontact_idxx",
+    		ID: "xxcontact_idxx",
 }
 
 resp, err := forceAPI.Delete(delete)
 if err != nil {
-  fmt.Println(err)
+  log.Fatalf("Delete failed: %v", err)
 }
+// do something with response
 ```
 
 ## Request API
@@ -81,11 +84,12 @@ if err != nil {
 data_request := &goforce.Request{
 		ServiceURL: "/services/apexrest/amalia/v2/contact",
 		Fields:     map[string]interface{
-        "Name": "Redha",
-    },
+        		"Name": "Redha",
+    		},
 }
 resp, err := forceAPI.Request("POST", data_request)
 if err != nil {
-  fmt.Println(err)
+  log.Fatalf("Request failed: %v", err)
 }
+// do something with response
 ```
